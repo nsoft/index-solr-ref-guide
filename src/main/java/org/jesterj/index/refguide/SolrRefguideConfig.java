@@ -1,4 +1,4 @@
-package org.jesterj.refguide.shakespeare;
+package org.jesterj.index.refguide;
 
 import org.jesterj.ingest.JavaPlanConfig;
 import org.jesterj.ingest.PlanProvider;
@@ -23,6 +23,7 @@ public class SolrRefguideConfig implements PlanProvider {
   private static final String SIZE_TO_INT = "size_to_int_step";
   private static final String TIKA = "tika_step";
   private static final String SCANNER = "file_scanner";
+  public static final String REMOVE_NAVS = "RemoveNavs";
 
   public Plan getPlan() {
 
@@ -31,6 +32,7 @@ public class SolrRefguideConfig implements PlanProvider {
     // Of course you are free to declare these along with configs if you prefer.
     PlanImpl.Builder planBuilder = new PlanImpl.Builder();
     SimpleFileScanner.Builder scanner = new SimpleFileScanner.Builder();
+    StepImpl.Builder removeNav = new StepImpl.Builder();
     StepImpl.Builder formatCreated = new StepImpl.Builder();
     StepImpl.Builder formatModified = new StepImpl.Builder();
     StepImpl.Builder formatAccessed = new StepImpl.Builder();
@@ -54,6 +56,13 @@ public class SolrRefguideConfig implements PlanProvider {
         .rememberScannedIds(true)
         .detectChangesViaHashing(true)
         .scanFreqMS(60000);
+
+    removeNav
+            .named(REMOVE_NAVS)
+            .withProcessor(
+                    new RemoveNavsProcessor.Builder()
+                            .named("removeNavs")
+            );
 
     // format the several dates produced by the scanner (to the default ISO output, solr wants)
     formatCreated
@@ -136,7 +145,8 @@ public class SolrRefguideConfig implements PlanProvider {
 
         // arguments: Builder for step, NAME of any predecessor steps. THIS is why all steps must be
         // named and all names must be unique. You will get an error if you have duplicate names.
-        .addStep(formatCreated, SCANNER)
+        .addStep(removeNav, SCANNER)
+        .addStep(formatCreated, REMOVE_NAVS)
         .addStep(formatModified, CREATED)
         .addStep(formatAccessed, MODIFIED)
         .addStep(renameFileSizeToInteger, ACCESSED)

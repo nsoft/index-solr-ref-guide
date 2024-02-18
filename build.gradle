@@ -3,6 +3,7 @@ plugins {
   id 'java'
   id 'wrapper'
   id "com.needhamsoftware.solr-gradle" version "1.0.2"
+  id 'com.needhamsoftware.unojar' version '1.1.0'
 }
 
 group 'org.jesterj'
@@ -13,6 +14,7 @@ repositories {
 }
 
 dependencies {
+  implementation 'org.jsoup:jsoup:1.17.2' // for RemoveNavsProcessor
   implementation ('org.jesterj:jesterj-ingest:1.0.0') {
     exclude group: 'ch.qos.logback'
   }
@@ -22,4 +24,21 @@ solr {
   zkHost 'localhost:2181/solr__home_gus_projects_gus-asf_solr_fork_testing_2024-02-12'
   confName 'ref-guide'
   confDir 'src/main/solr/configs/ref-guide'
+}
+
+configurations {
+  unoJarPack
+  // things we don't want to include for license or bloat reasons can be named here.
+  // We definitely don't want to pack an entire set of JesterJ dependencies since
+  // those will already be provided when running within JesterJ
+  unoJarPack.exclude group: 'org.jesterj'
+  unoJarPack.extendsFrom runtime
+}
+
+// Since custom steps introduce dependencies of their own we need to package with unojar to provide them.
+ext.archiveName = project.name
+unojar {
+  archivesBaseName = archiveName
+  archiveClassifier = "dep"
+  mainClass = 'org.example.do.not.Run'
 }

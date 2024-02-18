@@ -40,7 +40,7 @@ cd /dir/you/checked/out/this/project
 ./gradlew upconfig
 ----
 
-1. Then in org.jesterj.refguide.shakespeare.SolrRefguideConfig paste the absolute path to /solr/solr/solr-ref-guide/build/site into
+1. Then in org.jesterj.index.refguide.SolrRefguideConfig paste the absolute path to /solr/solr/solr-ref-guide/build/site into
 +
 [source,java]
 ----
@@ -66,7 +66,7 @@ sendToSolrBuilder
 [source,bash]
 ----
 export JAVA_HOME=/home/gus/.jdks/azul-11.0.19
-./gradlew build
+./gradlew packageUnoJar
 ----
 
 1. Index the ref guide!
@@ -74,13 +74,13 @@ export JAVA_HOME=/home/gus/.jdks/azul-11.0.19
 [source,bash]
 ----
 export JAVA_HOME=/home/gus/.jdks/azul-11.0.19
-$JAVA_HOME/bin/java -jar jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT.jar solrrefguide s3cret
+$JAVA_HOME/bin/java -jar jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar solrrefguide s3cret
 ----
 
 You will see a few exceptions, but this is just some image files that Tika doesn't like, and after 3 tries JesterJ will mark those files dead and ignore them ever after. JesterJ will continue to run and every minute it will check for changes to the files. Any ref guide files that are updated will be re-indexed.
 
 If you want to re-index for some reason, the easiest thing to do is delete `~/.jj/solrrefguide` which holds all the JesterJ logs, and the files for the cassandra database.
 
-You may notice that JesterJ regularly logs a graphviz visualization of it's current state. You can paste that at https://dreampuf.github.io/GraphvizOnline/ and you will get something that looks like:
+You may notice that JesterJ regularly logs a graphviz visualization of its current state. You can paste that at https://dreampuf.github.io/GraphvizOnline/ and you will get something that looks like:
 
 image::images/Screenshot from 2024-02-16 20-23-18.png[]
