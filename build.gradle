@@ -10,12 +10,13 @@ group 'org.jesterj'
 version '1.0-SNAPSHOT'
 
 repositories {
+  mavenLocal()
   mavenCentral()
 }
 
 dependencies {
   implementation 'org.jsoup:jsoup:1.17.2' // for RemoveNavsProcessor
-  implementation ('org.jesterj:jesterj-ingest:1.0.0') {
+  implementation ('org.jesterj:jesterj-ingest:1.1.0-SNAPSHOT') {
     exclude group: 'ch.qos.logback'
   }
 }
@@ -41,4 +42,5 @@ unojar {
   archivesBaseName = archiveName
   archiveClassifier = "dep"
   mainClass = 'org.example.do.not.Run'
+  manifestAttributes = ['Add-Opens':'ALL-UNNAMED=ALL-UNNAMED']
 }
