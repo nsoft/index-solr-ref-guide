@@ -43,7 +43,7 @@ export JAVA_11_HOME=~/tools/zulu11.72.19-ca-jdk11.0.23-linux_x64
 1. Run the script with -S and -j args to download, build and run solr, then download and run jesterj. If all goes well you should be able to see documents in solr at http://localhost:8981/solr/#/ref_guide/query within several minutes (most of which is setup/building and startup of solr )
 +
 [source,bash]
-----r
+----
 get-solr.sh -Sj
 ----
 
