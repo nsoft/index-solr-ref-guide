@@ -20,8 +20,10 @@ dependencies {
   }
 }
 
+def ZK = System.getProperty("zkHost")
+
 solr {
-  zkHost 'localhost:2181/solr__home_gus_projects_gus-asf_solr_fork_testing_2024-02-12'
+  zkHost ZK
   confName 'ref-guide'
   confDir 'src/main/solr/configs/ref-guide'
 }

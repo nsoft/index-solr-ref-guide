@@ -1,5 +1,6 @@
 package org.jesterj.index.refguide;
 
+import org.apache.solr.common.StringUtils;
 import org.jesterj.ingest.JavaPlanConfig;
 import org.jesterj.ingest.PlanProvider;
 import org.jesterj.ingest.model.Plan;
@@ -42,7 +43,7 @@ public class SolrRefguideConfig implements PlanProvider {
 
     // If you have things to declare/create that will be used in configuration get it out of the way
     // here to keep the config concise.
-    File refGuideAbsoluteLocation = new File("/home/gus/projects/gus-asf/solr/fork/solr/solr/solr-ref-guide/build/site/solr/latest");
+    File refGuideLocation = new File("solr/code/solr/solr/solr-ref-guide/build/site/solr/latest");
 
     //
     // This is the first important part. Each step needs to be configured. Order is NOT important, but I find it
@@ -52,7 +53,7 @@ public class SolrRefguideConfig implements PlanProvider {
     // Our initial source of documents, note the use of testDocs defined above to keep this legible
     scanner
         .named(SCANNER) // everything should be given a unique name composed of alphanumerics and underscores only.
-        .withRoot(refGuideAbsoluteLocation)
+        .withRoot(refGuideLocation)
         .rememberScannedIds(true)
         .detectChangesViaHashing(true)
         .scanFreqMS(60000);
@@ -120,12 +121,16 @@ public class SolrRefguideConfig implements PlanProvider {
         );
 
     // And this is where we finally send the finished product to Solr!
+    String zk = System.getProperty("zkHost");
+    if (StringUtils.isEmpty(zk)) {
+      throw new RuntimeException("Please set the system property 'zkHost' to point to the location of zookeeper (with the zkChroot)");
+    }
     sendToSolrBuilder
         .named("solr_sender")
         .withProcessor(
             new SendToSolrCloudProcessor.Builder()
                 .named("solr_processor")
-                .withZookeeper("localhost:2181/solr__home_gus_projects_gus-asf_solr_fork_testing_2024-02-12")
+                .withZookeeper(zk)
                 .usingCollection("ref_guide")
                 .placingTextContentIn("_text_")
                 .withDocFieldsIn(".fields")
