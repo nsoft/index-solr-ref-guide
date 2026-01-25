@@ -159,7 +159,7 @@ if [ "download" = "$JJ_ACTION" ]; then
     curl -sL  -o "jesterj-ingest-1.0.0-node.jar" "https://github.com/nsoft/jesterj/releases/download/1.0.0/jesterj-ingest-1.0.0-node.jar"
   fi
 
-  nohup $JAVA_11_HOME/bin/java -jar -DzkHost=$ZK_HOST jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar solrrefguide s3cret > jj.output.log &
+  nohup $JAVA_11_HOME/bin/java -jar -DzkHost=$ZK_HOST jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar solrrefguide s3cret > /dev/null &
 
   echo "JesterJ startup attempted check jj.output.log and  ~/.jj/logs for details"
 fi
