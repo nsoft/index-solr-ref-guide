@@ -5,25 +5,26 @@ An example of using https://github.com/nsoft/jesterj[JesterJ] to index html, tha
 [#_pre_requisites]
 == Pre-Requisites
 1. Linux/bash environment
-1. zookeeper accessible via localhost:2181
-1. able to modify current directory
-1. current directory is the top of a checkout of https://github.com/nsoft/index-solr-ref-guide/
-1. able to reach github with git clone or git pull command (no auth req)
-1. ports 5001-5004, 7981-7984 and 8981-8984 are not used for other purposes (used by solr)
-1. port 7000 and 9042 must be open (used by JesterJ cassandra)
-1. able to create/modify contents of ~/.jj (jesterj puts logs and cassandra db here)
-1. jq command line utility must be installed
-1. java 11 must be available at $JAVA_11_HOME (required for -j only)
+1. Zookeeper accessible via localhost:2181
+1. Able to modify current directory
+1. Able to reach github & have git installed (no auth req)
+1. Ports 5001-5004, 7981-7984 and 8981-8984 are not used for other purposes (used by solr)
+1. Ports 7000 and 9042 must be available (used by JesterJ cassandra)
+1. Able to create/modify contents of `~/.jj` directory (jesterj puts logs and cassandra db here)
+1. `jq` command line utility must be installed
 
 
 == Steps:
+
 1. Ensure java is available, preferrably java 21 is the system JDK for solr/zookeeper
 
 1. Download and install zookeeper listening to localhost on its default port (2181).
 There is no need to set anything up in zookeeper, and you only need a single node running.
 There is no benefit to having a multi-node quorum for a toy installation like this.
 
-1. Download and install unpack a JDK 11 - this is required by JesterJ (for a little while longer)
+1. Download and unpack a JDK 11 - this is required by JesterJ (for a little while longer)
+
+1. Ensure you are in the same directory as this README file.
 
 1. Export the JDK_11_HOME environment variable (adjust to your install location/distro)
 +
