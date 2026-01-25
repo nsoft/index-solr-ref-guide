@@ -4,6 +4,7 @@ An example of using https://github.com/nsoft/jesterj[JesterJ] to index html, tha
 
 [#_pre_requisites]
 == Pre-Requisites
+1. Linux/bash environment
 1. zookeeper accessible via localhost:2181
 1. able to modify current directory
 1. current directory is the top of a checkout of https://github.com/nsoft/index-solr-ref-guide/
@@ -25,7 +26,6 @@ There is no benefit to having a multi-node quorum for a toy installation like th
 1. Download and install unpack a JDK 11 - this is required by JesterJ (for a little while longer)
 
 1. Export the JDK_11_HOME environment variable (adjust to your install location/distro)
-
 +
 [source,bash]
 ----
