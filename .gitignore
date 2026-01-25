@@ -24,12 +24,7 @@ hs_err_pid*
 replay_pid*
 
 /solr
-/.idea/.gitignore
-/.idea/compiler.xml
-/.idea/gradle.xml
-/.idea/jarRepositories.xml
-/.idea/misc.xml
-/.idea/vcs.xml
+/.idea
 /.gradle/8.2/checksums/checksums.lock
 /.gradle/8.2/checksums/md5-checksums.bin
 /.gradle/8.2/checksums/sha1-checksums.bin

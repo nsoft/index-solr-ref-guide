@@ -13,6 +13,13 @@ An example of using https://github.com/nsoft/jesterj[JesterJ] to index html, tha
 1. Able to create/modify contents of `~/.jj` directory (jesterj puts logs and cassandra db here)
 1. `jq` command line utility must be installed
 
+== Recommended
+The get-solr.sh script has been tested locally, and on AWS instance. Since we will be running runs all of zookeeper, solr and jesterj, the smallest instances won't work very well. The following are recommended machine capabilities.
+
+1. 32GB ram
+1. 4 cpus
+1. at least 6GB free space
+1. on AWS, r6gd.xlarge worked like a charm, but r6gd.large wedged hard and had to be forcefully stopped.
 
 == Steps:
 
@@ -33,10 +40,10 @@ There is no benefit to having a multi-node quorum for a toy installation like th
 export JAVA_11_HOME=~/tools/zulu11.72.19-ca-jdk11.0.23-linux_x64
 ----
 
-1. Run the script with -S and -j args to download, build and run solr, then download and run jesterj. If all goes well you should be able to see documents in solr at http://localhost:8981/solr/#/ref_guide/query within 2-3 minutes (most of which is setup/building and startup of solr)
+1. Run the script with -S and -j args to download, build and run solr, then download and run jesterj. If all goes well you should be able to see documents in solr at http://localhost:8981/solr/#/ref_guide/query within several minutes (most of which is setup/building and startup of solr )
 +
 [source,bash]
-----
+----r
 get-solr.sh -Sj
 ----
 
@@ -52,7 +59,6 @@ You will see a few exceptions in JesterJ logs (at `~/jj/solrrefguide/logs/jj.log
 If you want to re-index for some reason, the easiest thing to do is delete `~/.jj/solrrefguide` which holds all the JesterJ logs, and the files for the cassandra database.
 
 You may notice that JesterJ regularly logs a graphviz visualization of its current state. This will look something like:
-
 [source,bash]
 ----
 digraph "visualize" {
