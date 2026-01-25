@@ -102,20 +102,9 @@ public class SolrRefguideConfig implements PlanProvider {
                 .retainingOriginal(false)
         );
 
-    // This lets Tika process the documents we scanned. This is more for example than functionality since the documents
-    // are already plain text. A more sophisticated solution would add a custom processor here to identify speakers
-    // based on the formatting and could make it possible to search for matches in lines spoken by Rozencrantz or
-    // Guildenstern or whatever. The sky is the limit if you can parse it and get the information into the document
-    // such that solr can understand it.
+    // use Tika to extract the text from the html
     tikaBuilder
         .named(TIKA)
-
-//      If you wanted to send the result to more than one step (e.g. to two different collections) you would add a
-//      Router with something like the commented code below.
-
-//        .routingBy(new DuplicateToAll.Builder()
-//            .named("duplicator"))
-
         .withProcessor(new TikaProcessor.Builder()
             .named("tika")
         );
