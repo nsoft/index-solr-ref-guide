@@ -52,7 +52,7 @@ You will see a few exceptions in JesterJ logs (at `~/jj/solrrefguide/logs/jj.log
 If you want to re-index for some reason, the easiest thing to do is delete `~/.jj/solrrefguide` which holds all the JesterJ logs, and the files for the cassandra database.
 
 You may notice that JesterJ regularly logs a graphviz visualization of its current state. This will look something like:
-+
+
 [source,bash]
 ----
 digraph "visualize" {
