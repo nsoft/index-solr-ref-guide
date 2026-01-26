@@ -16,14 +16,13 @@ public class Server {
 
     ServletContextHandler ctx = new ServletContextHandler();
     ctx.setContextPath("/");
+    ctx.setWelcomeFiles(new String[]{"search.html", "index.html"});
     ServletHolder proxyHolder = ctx.addServlet(SearchProxy.class, "/search/*");
 
     // Add the DefaultServlet to serve static content.
     ServletHolder staticHolder = ctx.addServlet(DefaultServlet.class, "/");
     staticHolder.setInitParameter("resourceBase", "solr/code/solr/solr/solr-ref-guide/build/site");
     staticHolder.setAsyncSupported(true);
-
-    ctx.setWelcomeFiles(new String[]{"index.html"});
 
     server.setHandler(ctx);
     server.start();

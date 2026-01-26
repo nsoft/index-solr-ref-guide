@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solr Reference Guide Search</title>
+    <style type="text/css">
+        body {
+            text-align: center;
+        }
+        table {
+            display: inline-block;
+        }
+        td {
+            width: 250px;
+        }
+        input {
+            width: 50%;
+            font-size:24pt
+        }
+        button {
+            margin-top:1.5em;
+            font-size:24pt
+        }
+        h2 {
+            margin-top:3em;
+            margin-bottom: -1em;
+        }
+        pre {
+            text-align: left;
+            width:50%;
+            display: inline-block;
+        }
+    </style>
+    <script type="text/javascript">
+        function httpGet(theUrl)
+        {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+            xmlHttp.send( null );
+            return xmlHttp.responseText;
+        }
+
+        function search(evt) {
+            var queryString = document.getElementById("search").value
+            var url= "/search?fl=dc_title,id&q=" + queryString
+            var resp = httpGet(url)
+            document.getElementById("results").innerHTML = resp;
+        }
+
+        window.addEventListener("load", (event) => {
+            document.getElementById("runSearch").addEventListener("click", search)
+        });
+    </script>
+</head>
+<body>
+<h1>Search the Solr Reference Guide</h1>
+<input id="search" type="text" value="localparams"/>
+<button type="button" id="runSearch">Search</button>
+<pre id="results"></pre>
+<h2> Powered By:</h2>
+<table>
+    <tr><td><img src="_/img/JesterJ.jpg" alt="JesterJ&trade;" width="200"></td>
+        <td><img src="solr/latest/_images/Solr_Logo_on_white.png" alt="Solr&reg;" width="200"/></td>
+        <td><img src="_/img/jetty-logo.svg" alt="Jetty&reg;" width="200"/></td></tr>
+</table>
+</body>
+</html>
