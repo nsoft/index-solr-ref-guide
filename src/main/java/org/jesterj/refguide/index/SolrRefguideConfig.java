@@ -1,4 +1,4 @@
-package org.jesterj.index.refguide;
+package org.jesterj.refguide.index;
 
 import org.apache.solr.common.StringUtils;
 import org.jesterj.ingest.JavaPlanConfig;

@@ -164,4 +164,20 @@ if [ "download" = "$JJ_ACTION" ]; then
   echo "JesterJ startup attempted check jj.output.log and  ~/.jj/logs for details"
 fi
 
+PROXY_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8980/search?q=*:*")
+
+if [ ! "200" == "$PROXY_STATUS" ]; then
+  echo "Proxy not started or in error, (re)starting..."
+  lsof -i -n -P | grep LIST | grep 8980 | awk '{ print$2 }' | xargs kill -9
+  cp build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar .
+  nohup java -jar index-solr-ref-guide-1.0-SNAPSHOT-dep.jar > nohup2.out 2>&1 &
+  echo "Http proxy and static server started."
+  echo "search the ref guide at http://localhost:8980/search?q=localparams"
+  echo "browse the ref guide at http://localhost:8980/"
+else
+  echo "Http proxy and static server already started."
+  echo "search the ref guide at http://localhost:8980/search?q=localparams"
+  echo "browse the ref guide at http://localhost:8980/"
+fi
+
 echo "Solr Reference Guide should now match the latest head (SNAPSHOT) version"

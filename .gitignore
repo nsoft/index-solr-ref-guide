@@ -43,3 +43,4 @@ replay_pid*
 /.gradle/vcs-1/gc.properties
 /.gradle/file-system.probe
 /build/
+/nohup2.out
