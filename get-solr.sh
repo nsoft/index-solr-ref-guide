@@ -159,6 +159,12 @@ if [ "download" = "$JJ_ACTION" ]; then
     curl -sL  -o "jesterj-ingest-1.0.0-node.jar" "https://github.com/nsoft/jesterj/releases/download/1.0.0/jesterj-ingest-1.0.0-node.jar"
   fi
 
+  # Kill jesterj if it's still running
+  JJ_PROC = $(lsof -i -n -P | grep LIST | grep 9042 | awk '{ print$2 }')
+  if [ ! -z "$JJ_PROC" ]; then
+    kill -9 "$JJ_PROC"
+  fi
+
   nohup $JAVA_11_HOME/bin/java -jar -DzkHost=$ZK_HOST jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar solrrefguide s3cret > /dev/null &
 
   echo "JesterJ startup attempted check jj.output.log and  ~/.jj/logs for details"
@@ -168,15 +174,19 @@ PROXY_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8980/sea
 
 if [ ! "200" == "$PROXY_STATUS" ]; then
   echo "Proxy not started or in error, (re)starting..."
-  lsof -i -n -P | grep LIST | grep 8980 | awk '{ print$2 }' | xargs kill -9
+  PROXY_PROC = $(lsof -i -n -P | grep LIST | grep 8980 | awk '{ print$2 }')
+  if [ ! -z "$PROXY_PROC" ]; then
+    kill -9 "$PROXY_PROC"
+  fi
+  JAVA_HOME="$JAVA_11_HOME" bash -c './gradlew packageUnoJar'
   cp build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar .
   nohup java -jar index-solr-ref-guide-1.0-SNAPSHOT-dep.jar > nohup2.out 2>&1 &
   echo "Http proxy and static server started."
-  echo "search the ref guide at http://localhost:8980/search?q=localparams"
+  echo "search the ref guide at http://localhost:8980/search?q=localparams&fl=dc_title,id"
   echo "browse the ref guide at http://localhost:8980/"
 else
   echo "Http proxy and static server already started."
-  echo "search the ref guide at http://localhost:8980/search?q=localparams"
+  echo "search the ref guide at http://localhost:8980/search?q=localparams&fl=dc_title,id"
   echo "browse the ref guide at http://localhost:8980/"
 fi
 
