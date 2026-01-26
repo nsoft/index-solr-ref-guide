@@ -40,15 +40,31 @@ There is no benefit to having a multi-node quorum for a toy installation like th
 export JAVA_11_HOME=~/tools/zulu11.72.19-ca-jdk11.0.23-linux_x64
 ----
 
-1. Run the script with -S and -j args to download, build and run solr, then download and run jesterj. If all goes well you should be able to see documents in solr at http://localhost:8981/solr/#/ref_guide/query within several minutes (most of which is setup/building and startup of solr )
+1. Run the script with -S and -j args to download, build and run solr, then download and run jesterj.
 +
 [source,bash]
 ----
 get-solr.sh -Sj
 ----
++
+If all goes well you should be able to see
++
 
 1. Whenever you want to update to the latest version of the ref guide, just run the script without any arguments. This also updates the configset and reloads the collection in solr.
 +
+[source,bash]
+----
+Http proxy and static server started.
+search the ref guide at http://localhost:8980/search?q=localparams&fl=dc_title,id
+browse the ref guide at http://localhost:8980/
+Solr Reference Guide should now match the latest head (SNAPSHOT) version
+
+----
+http://localhost:8980/search.html should also look like this (work in progress):
+
+image::images/Screenshot from 2026-01-26 03-16-59.png[]
+
+To keep the index up to date just run:
 [source,bash]
 ----
 get-solr.sh
