@@ -160,7 +160,7 @@ if [ "download" = "$JJ_ACTION" ]; then
   fi
 
   # Kill jesterj if it's still running
-  JJ_PROC = $(lsof -i -n -P | grep LIST | grep 9042 | awk '{ print$2 }')
+  JJ_PROC=$(lsof -i -n -P | grep LIST | grep 9042 | awk '{ print$2 }')
   if [ ! -z "$JJ_PROC" ]; then
     kill -9 "$JJ_PROC"
   fi
