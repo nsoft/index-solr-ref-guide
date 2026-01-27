@@ -242,5 +242,6 @@
   <field name="viewport" type="string"/>
   <field name="width" type="plongs"/>
   <field name="zTXt_zTXtEntry" type="string"/>
+  <field name="path" type="string"/>
 
 </schema>

@@ -1,67 +1,107 @@
 <!DOCTYPE html>
+<!--suppress HtmlUnknownTarget -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Solr Reference Guide Search</title>
-    <style type="text/css">
+    <style>
         body {
             text-align: center;
         }
+
         table {
             display: inline-block;
         }
+
         td {
             width: 250px;
         }
+
         input {
             width: 50%;
-            font-size:24pt
+            font-size: 24pt
         }
+
         button {
-            margin-top:1.5em;
-            font-size:24pt
+            margin-top: 1.5em;
+            font-size: 24pt
         }
+
         h2 {
-            margin-top:3em;
+            margin-top: 3em;
             margin-bottom: -1em;
         }
+
         pre {
             text-align: left;
-            width:50%;
+            width: 50%;
             display: inline-block;
+        }
+
+        #results {
+            width: 50%;
+            text-align: left;
+            display: inline-block;
+        }
+
+        h3 {
+            display:none;
         }
     </style>
     <script type="text/javascript">
-        function httpGet(theUrl)
-        {
+        function httpGet(theUrl) {
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-            xmlHttp.send( null );
+            xmlHttp.open("GET", theUrl, false); // false for synchronous request
+            xmlHttp.send(null);
             return xmlHttp.responseText;
         }
 
-        function search(evt) {
+        function search() {
             var queryString = document.getElementById("search").value
-            var url= "/search?fl=dc_title,id&q=" + queryString
+            var url = "/search?fl=dc_title,id,path&q=" + queryString
             var resp = httpGet(url)
-            document.getElementById("results").innerHTML = resp;
+            let raw = document.getElementById("rawResults");
+            raw.innerHTML = resp;
+            raw.style.display = 'inline-block'
+            document.getElementById("rawHeader").style.display = 'block'
+            let parsedDocs = JSON.parse(resp).response.docs;
+            let resList = document.createElement("ul");
+            for (const parsedDoc of parsedDocs) {
+                let li = document.createElement("li");
+                let a = document.createElement("a");
+                a.href = parsedDoc.path;
+                a.innerHTML = parsedDoc.dc_title;
+                li.appendChild(a);
+                resList.appendChild(li);
+            }
+
+            let results = document.getElementById("results");
+            results.innerHTML = '';
+            results.appendChild(resList);
         }
 
-        window.addEventListener("load", (event) => {
+        window.addEventListener("load", () => {
             document.getElementById("runSearch").addEventListener("click", search)
         });
     </script>
 </head>
 <body>
 <h1>Search the Solr Reference Guide</h1>
+<!--suppress HtmlFormInputWithoutLabel -->
 <input id="search" type="text" value="localparams"/>
 <button type="button" id="runSearch">Search</button>
-<pre id="results"></pre>
+<div id="results">
+
+</div>
+<h3 id="rawHeader">Raw Response from solr:</h3>
+<pre id="rawResults"></pre>
 <h2> Powered By:</h2>
 <table>
-    <tr><td><img src="_/img/JesterJ.jpg" alt="JesterJ&trade;" width="200"></td>
+    <tr>
+        <td><img src="_/img/JesterJ.jpg" alt="JesterJ&trade;" width="200"></td>
         <td><img src="solr/latest/_images/Solr_Logo_on_white.png" alt="Solr&reg;" width="200"/></td>
-        <td><img src="_/img/jetty-logo.svg" alt="Jetty&reg;" width="200"/></td></tr>
+        <td><img src="_/img/jetty-logo.svg" alt="Jetty&reg;" width="200"/></td>
+    </tr>
 </table>
 </body>
 </html>

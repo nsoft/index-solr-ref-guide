@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -13,7 +15,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -29,7 +30,7 @@ public class SearchProxy extends HttpServlet {
   private InetSocketAddress solr;
 
   @Override
-  public void init() throws ServletException {
+  public void init() {
     jettyClient = new HttpClient();
     try {
       jettyClient.start();
@@ -40,7 +41,7 @@ public class SearchProxy extends HttpServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
     // make sure that the user can't utilize any undesirable request parameters.
     // such as collection= to search other collections.
@@ -49,7 +50,10 @@ public class SearchProxy extends HttpServlet {
     try {
       // whatever they send us it's going to go to select on localhost
       // and our wrapper will delete annoying parameters and peg defType to edismax.
-      ContentResponse http = jettyClient.GET(new URI("http", null, solr.getHostName(), solr.getPort(), "/solr/ref_guide/select", req.getQueryString(), null));
+      String queryString = req.getQueryString();
+      queryString = URLDecoder.decode(queryString, Charset.defaultCharset());
+      ContentResponse http = jettyClient.GET(new URI("http", null, solr.getHostName(),
+          solr.getPort(), "/solr/ref_guide/select", queryString, null));
       HttpFields headers = http.getHeaders();
       headers.stream().forEach(h -> {
         if (h.getHeader() != null) {
@@ -57,20 +61,14 @@ public class SearchProxy extends HttpServlet {
         }
       });
       resp.getOutputStream().write(http.getContent());
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    } catch (ExecutionException e) {
-      throw new RuntimeException(e);
-    } catch (TimeoutException e) {
-      throw new RuntimeException(e);
-    } catch (URISyntaxException e) {
+    } catch (InterruptedException | ExecutionException | TimeoutException | URISyntaxException e) {
       throw new RuntimeException(e);
     }
 
   }
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
   }
 
   /**
@@ -145,13 +143,13 @@ public class SearchProxy extends HttpServlet {
       StringBuffer result = new StringBuffer(simple.length() * 25);
       simple.chars().forEach(c -> {
         result.append("(?:[");
-        Character ch = (char) c;
+        char ch = (char) c;
         // character might be either capitalization - possibly we can skip this
         // I think we treat parameters as case-sensitive, but not 100% sure about that.
         // overly conservative for now...
-        String lowerCase = ch.toString().toLowerCase();
+        String lowerCase = Character.toString(ch).toLowerCase();
         result.append(lowerCase);
-        String upperCase = ch.toString().toUpperCase();
+        String upperCase = Character.toString(ch).toUpperCase();
         result.append(upperCase);
         String hexUpper = Integer.toHexString(upperCase.charAt(0));
         String hexLower = Integer.toHexString(lowerCase.charAt(0));

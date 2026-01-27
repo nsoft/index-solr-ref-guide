@@ -7,6 +7,7 @@ import org.jesterj.ingest.model.Plan;
 import org.jesterj.ingest.model.impl.PlanImpl;
 import org.jesterj.ingest.model.impl.StepImpl;
 import org.jesterj.ingest.processors.CopyField;
+import org.jesterj.ingest.processors.RegexValueReplace;
 import org.jesterj.ingest.processors.SendToSolrCloudProcessor;
 import org.jesterj.ingest.processors.SimpleDateTimeReformatter;
 import org.jesterj.ingest.processors.TikaProcessor;
@@ -25,6 +26,8 @@ public class SolrRefguideConfig implements PlanProvider {
   private static final String TIKA = "tika_step";
   private static final String SCANNER = "file_scanner";
   public static final String REMOVE_NAVS = "RemoveNavs";
+  public static final String COPY_ID_TO_PATH_STEP = "CopyIdToPathStep";
+  public static final String FIX_PATH_WITH_REGEX_STEP = "FixPathWithRegexStep";
 
   public Plan getPlan() {
 
@@ -38,6 +41,8 @@ public class SolrRefguideConfig implements PlanProvider {
     StepImpl.Builder formatModified = new StepImpl.Builder();
     StepImpl.Builder formatAccessed = new StepImpl.Builder();
     StepImpl.Builder renameFileSizeToInteger = new StepImpl.Builder();
+    StepImpl.Builder copyIdToPathField = new StepImpl.Builder();
+    StepImpl.Builder fixPathRegex = new StepImpl.Builder();
     StepImpl.Builder tikaBuilder = new StepImpl.Builder();
     StepImpl.Builder sendToSolrBuilder = new StepImpl.Builder();
 
@@ -102,6 +107,22 @@ public class SolrRefguideConfig implements PlanProvider {
                 .retainingOriginal(false)
         );
 
+    copyIdToPathField.named(COPY_ID_TO_PATH_STEP)
+            .withProcessor(new CopyField.Builder()
+                .named("CopyIdToPathProcessor")
+                .from("id")
+                .into("path")
+                .retainingOriginal(true)
+            );
+
+    fixPathRegex.named(FIX_PATH_WITH_REGEX_STEP)
+            .withProcessor(new RegexValueReplace.Builder()
+                .named("FixPathWithRegexProcessor")
+                .editingField("path")
+                .withRegex("file://.*solr-ref-guide/build/site(/solr/latest.*)")
+                .andReplacement("$1")
+            );
+
     // use Tika to extract the text from the html
     tikaBuilder
         .named(TIKA)
@@ -144,7 +165,9 @@ public class SolrRefguideConfig implements PlanProvider {
         .addStep(formatModified, CREATED)
         .addStep(formatAccessed, MODIFIED)
         .addStep(renameFileSizeToInteger, ACCESSED)
-        .addStep(tikaBuilder, SIZE_TO_INT)
+        .addStep(copyIdToPathField, SIZE_TO_INT)
+        .addStep(fixPathRegex, COPY_ID_TO_PATH_STEP)
+        .addStep(tikaBuilder, FIX_PATH_WITH_REGEX_STEP)
         .addStep(sendToSolrBuilder, TIKA);
     return planBuilder.build();
 

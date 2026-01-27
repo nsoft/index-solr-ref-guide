@@ -184,12 +184,14 @@ if [ ! "200" == "$PROXY_STATUS" ]; then
   cp src/main/images/* solr/code/solr/solr/solr-ref-guide/build/site/_/img
   nohup java -jar index-solr-ref-guide-1.0-SNAPSHOT-dep.jar > nohup2.out 2>&1 &
   echo "Http proxy and static server started."
-  echo "search the ref guide at http://localhost:8980/search?q=localparams&fl=dc_title,id"
-  echo "browse the ref guide at http://localhost:8980/"
+  echo "search the ref guide at http://localhost:8980/"
+  echo "browse the ref guide at http://localhost:8980/solr/latest"
+  echo "search the directly at http://localhost:8980/search?q=localparams&fl=dc_title,id"
 else
   echo "Http proxy and static server already started."
-  echo "search the ref guide at http://localhost:8980/search?q=localparams&fl=dc_title,id"
-  echo "browse the ref guide at http://localhost:8980/"
+  echo "search the ref guide at http://localhost:8980/"
+  echo "browse the ref guide at http://localhost:8980/solr/latest"
+  echo "search the directly at http://localhost:8980/search?q=localparams&fl=dc_title,id"
 fi
 
 echo "Solr Reference Guide should now match the latest head (SNAPSHOT) version"
