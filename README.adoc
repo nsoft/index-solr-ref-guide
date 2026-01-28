@@ -62,7 +62,7 @@ Solr Reference Guide should now match the latest head (SNAPSHOT) version
 ----
 http://localhost:8980/search.html should also look like this (work in progress):
 
-image::images/Screenshot from 2026-01-26 03-16-59.png[]
+image::images/ui-screenshot.png[]
 
 To keep the index up to date just run:
 [source,bash]
@@ -84,6 +84,8 @@ digraph "visualize" {
 "format_modified_date" ["color"="black","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\nformat_modified_date"]
 "format_accessed_date" ["color"="black","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\nformat_accessed_date"]
 "size_to_int_step" ["color"="black","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\nsize_to_int_step"]
+"CopyIdToPathStep" ["color"="black","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\nCopyIdToPathStep"]
+"FixPathWithRegexStep" ["color"="black","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\nFixPathWithRegexStep"]
 "tika_step" ["color"="black","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\ntika_step"]
 "solr_sender" ["color"="red","penwidth"="2.0","style"="filled","fillcolor"="white","label"="0/0\nsolr_sender"]
 "file_scanner" -> "RemoveNavs"
@@ -91,7 +93,9 @@ digraph "visualize" {
 "format_created_date" -> "format_modified_date"
 "format_modified_date" -> "format_accessed_date"
 "format_accessed_date" -> "size_to_int_step"
-"size_to_int_step" -> "tika_step"
+"size_to_int_step" -> "CopyIdToPathStep"
+"CopyIdToPathStep" -> "FixPathWithRegexStep"
+"FixPathWithRegexStep" -> "tika_step"
 "tika_step" -> "solr_sender"
 }
 
@@ -99,4 +103,4 @@ digraph "visualize" {
 
 You can paste that at https://dreampuf.github.io/GraphvizOnline/ and you will get something that looks like:
 
-image::images/Screenshot from 2024-02-16 20-23-18.png[]
+image::images/ingest.png[]
