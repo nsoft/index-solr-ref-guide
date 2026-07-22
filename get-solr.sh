@@ -47,7 +47,7 @@ fi
 # pass -s to download or refresh Solr
 # pass -j to download and start JesterJ
 # pass -J to clone, build and start JesterJ
-# Note: -j and -J are mutially exclusive last one wins.
+# Note: -j and -J are mutually exclusive last one wins.
 while getopts "sSjJ" arg; do
   case $arg in
   s) SOLR_ACTION="download"
@@ -60,6 +60,8 @@ while getopts "sSjJ" arg; do
     echo "-J for building JesterJ latest is not yet supported"
     exit 1
     ;;
+  *) echo "Unknown option"
+    exit 1
   esac
 done
 
@@ -67,14 +69,14 @@ done
 if [ ! -d "solr/code/solr" ]; then
   echo "checking out solr..."
   mkdir -p "solr/code"
-  pushd solr/code
+  pushd solr/code || exit
   git clone https://github.com/apache/solr.git
-  popd
+  popd || exit
 else
   echo "updating solr..."
-  pushd solr/code/solr
+  pushd solr/code/solr || exit
   git pull
-  popd
+  popd || exit
 fi
 
 if [ "$SOLR_ACTION" = "build" ]; then
@@ -85,14 +87,14 @@ if [ "$SOLR_ACTION" = "build" ]; then
     mkdir -p "solr/cloud"
     cp solr/code/solr/dev-tools/scripts/cloud.sh solr/cloud
     sed -i -e "s/DEFAULT_VCS_WORKSPACE='..\/solr'/DEFAULT_VCS_WORKSPACE='..\/code\/solr'/g" solr/cloud/cloud.sh
-    pushd solr/cloud
+    pushd solr/cloud || exit
     ./cloud.sh new -r refguide-index
-    popd
+    popd || exit
   else
     echo "Again.."
-    pushd solr/cloud
+    pushd solr/cloud || exit
     ./cloud.sh restart -r refguide-index
-    popd
+    popd || exit
   fi
 fi
 
@@ -104,7 +106,7 @@ if [ ! "200" == "$SOLR_STATUS" ]; then
   echo "Solr not started or not allowing access to solr/admin/info"
 else
   SOLR_INFO=$(curl -s http://localhost:8981/solr/admin/info/system?wt=json)
-  ZK_HOST=$(echo $SOLR_INFO | jq -r .zkHost)
+  ZK_HOST=$(echo "$SOLR_INFO" | jq -r .zkHost)
 fi
 
 if [ "unknown" = "$ZK_HOST" ]; then
@@ -117,7 +119,7 @@ fi
 
 echo "Uploading latest configset"
 # apply the latest configuration to solr
-./gradlew upconfig -DzkHost=$ZK_HOST
+./gradlew upconfig -DzkHost="$ZK_HOST"
 
 # create collection if it doesn't exist
 readarray -t cols < <(curl -s "http://localhost:8981/solr/admin/collections?action=LIST&wt=json" | jq -r '.collections[]')
@@ -139,9 +141,9 @@ fi
 
 # We now have the latest solr, up and running and thus also a checkout of the latest ref guide, time to build it!
 
-pushd solr/code/solr
+pushd solr/code/solr || exit
 ./gradlew buildLocalSite
-popd
+popd || exit
 
 # we now have a ref guide at solr/code/solr/solr/solr-ref-guide/site/index.html
 
@@ -161,11 +163,11 @@ if [ "download" = "$JJ_ACTION" ]; then
 
   # Kill jesterj if it's still running
   JJ_PROC=$(lsof -i -n -P | grep LIST | grep 9042 | awk '{ print$2 }')
-  if [ ! -z "$JJ_PROC" ]; then
+  if [ -n "$JJ_PROC" ]; then
     kill -9 "$JJ_PROC"
   fi
 
-  nohup $JAVA_11_HOME/bin/java -jar -DzkHost=$ZK_HOST jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar solrrefguide s3cret > /dev/null &
+  nohup "$JAVA_11_HOME"/bin/java -jar -DzkHost="$ZK_HOST" jesterj-ingest-1.0.0-node.jar build/libs/index-solr-ref-guide-1.0-SNAPSHOT-dep.jar solrrefguide s3cret > /dev/null &
 
   echo "JesterJ startup attempted check jj.output.log and  ~/.jj/logs for details"
 fi
@@ -175,7 +177,7 @@ PROXY_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8980/sea
 if [ ! "200" == "$PROXY_STATUS" ]; then
   echo "Proxy not started or in error, (re)starting..."
   PROXY_PROC=$(lsof -i -n -P | grep LIST | grep 8980 | awk '{ print$2 }')
-  if [ ! -z "$PROXY_PROC" ]; then
+  if [ -n "$PROXY_PROC" ]; then
     kill -9 "$PROXY_PROC"
   fi
   JAVA_HOME="$JAVA_11_HOME" bash -c './gradlew packageUnoJar'
